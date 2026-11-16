@@ -313,7 +313,7 @@ int clk_runtime_get_regmap(struct clk_regmap *rclk)
 	int ret;
 
 	if (pm_runtime_enabled(rclk->dev)) {
-		ret = pm_runtime_get_sync(rclk->dev);
+		ret = pm_runtime_resume_and_get(rclk->dev);
 		if (ret < 0)
 			return ret;
 	}
