@@ -1531,7 +1531,7 @@ static int _sde_encoder_resource_control_helper(struct drm_encoder *drm_enc,
 
 	if (enable) {
 		/* enable SDE core clks */
-		rc = pm_runtime_get_sync(drm_enc->dev->dev);
+		rc = pm_runtime_resume_and_get(drm_enc->dev->dev);
 		if (rc < 0) {
 			SDE_ERROR("failed to enable power resource %d\n", rc);
 			SDE_EVT32(rc, SDE_EVTLOG_ERROR);
@@ -4595,7 +4595,7 @@ static ssize_t _sde_encoder_misr_read(struct file *file,
 	}
 	drm_enc = &sde_enc->base;
 
-	rc = pm_runtime_get_sync(drm_enc->dev->dev);
+	rc = pm_runtime_resume_and_get(drm_enc->dev->dev);
 	if (rc < 0)
 		return rc;
 

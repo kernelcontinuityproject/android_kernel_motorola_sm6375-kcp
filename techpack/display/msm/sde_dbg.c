@@ -497,7 +497,7 @@ static void _sde_dump_reg(const char *dump_name, u32 reg_dump_flag,
 	SDE_DBG_LOG_DUMP_ADDR(dump_name, dump_addr, len_padded, (unsigned long)(addr - base_addr));
 
 	if (_sde_power_check(sde_dbg_base.dump_mode)) {
-		rc = pm_runtime_get_sync(sde_dbg_base.dev);
+		rc = pm_runtime_resume_and_get(sde_dbg_base.dev);
 		if (rc < 0) {
 			pr_err("failed to enable power %d\n", rc);
 			return;
@@ -1124,7 +1124,7 @@ static void _sde_dump_array(struct sde_dbg_reg_base *blk_arr[],
 	}
 
 	if (_sde_power_check(sde_dbg_base.dump_mode)) {
-		rc = pm_runtime_get_sync(sde_dbg_base.dev);
+		rc = pm_runtime_resume_and_get(sde_dbg_base.dev);
 		if (rc < 0) {
 			pr_err("failed to enable power %d\n", rc);
 			return;

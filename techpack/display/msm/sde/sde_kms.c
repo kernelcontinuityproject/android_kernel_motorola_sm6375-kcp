@@ -524,7 +524,7 @@ static int _sde_kms_sui_misr_ctrl(struct sde_kms *sde_kms,
 	int ret;
 
 	if (enable) {
-		ret = pm_runtime_get_sync(sde_kms->dev->dev);
+		ret = pm_runtime_resume_and_get(sde_kms->dev->dev);
 		if (ret < 0) {
 			SDE_ERROR("failed to enable resource, ret:%d\n", ret);
 			return ret;
