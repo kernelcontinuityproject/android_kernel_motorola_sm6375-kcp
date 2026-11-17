@@ -1,0 +1,185 @@
+diff --git a/techpack/display/msm/dsi/dsi_display.c b/techpack/display/msm/dsi/dsi_display.c
+index 5df252e01..001c195da 100644
+--- a/techpack/display/msm/dsi/dsi_display.c
++++ b/techpack/display/msm/dsi/dsi_display.c
+@@ -5923,7 +5923,7 @@ int dsi_display_cont_splash_config(void *dsi_display)
+ 		return -EINVAL;
+ 	}
+ 
+-	rc = pm_runtime_get_sync(display->drm_dev->dev);
++	rc = pm_runtime_resume_and_get(display->drm_dev->dev);
+ 	if (rc < 0) {
+ 		DSI_ERR("failed to vote gdsc for continuous splash, rc=%d\n",
+ 							rc);
+diff --git a/techpack/display/msm/sde/sde_color_processing.c b/techpack/display/msm/sde/sde_color_processing.c
+index b5cc70026..da10c4874 100644
+--- a/techpack/display/msm/sde/sde_color_processing.c
++++ b/techpack/display/msm/sde/sde_color_processing.c
+@@ -3092,7 +3092,7 @@ static void sde_cp_notify_ad_event(struct drm_crtc *crtc_drm, void *arg)
+ 	}
+ 
+ 	priv = kms->dev->dev_private;
+-	ret = pm_runtime_get_sync(kms->dev->dev);
++	ret = pm_runtime_resume_and_get(kms->dev->dev);
+ 	if (ret < 0) {
+ 		SDE_ERROR("failed to enable power resource %d\n", ret);
+ 		SDE_EVT32(ret, SDE_EVTLOG_ERROR);
+@@ -3330,7 +3330,7 @@ static void sde_cp_notify_hist_event(struct drm_crtc *crtc_drm, void *arg)
+ 		spin_unlock_irqrestore(&crtc->spin_lock, flags);
+ 		DRM_DEBUG_DRIVER("cannot find histogram event node in crtc\n");
+ 		/* unlock histogram */
+-		ret = pm_runtime_get_sync(kms->dev->dev);
++		ret = pm_runtime_resume_and_get(kms->dev->dev);
+ 		if (ret < 0) {
+ 			SDE_ERROR("failed to enable power resource %d\n", ret);
+ 			SDE_EVT32(ret, SDE_EVTLOG_ERROR);
+@@ -3355,7 +3355,7 @@ static void sde_cp_notify_hist_event(struct drm_crtc *crtc_drm, void *arg)
+ 				irq_idx, ret);
+ 			spin_unlock_irqrestore(&node->state_lock, state_flags);
+ 			spin_unlock_irqrestore(&crtc->spin_lock, flags);
+-			ret = pm_runtime_get_sync(kms->dev->dev);
++			ret = pm_runtime_resume_and_get(kms->dev->dev);
+ 			if (ret < 0) {
+ 				SDE_ERROR("failed to enable power %d\n", ret);
+ 				SDE_EVT32(ret, SDE_EVTLOG_ERROR);
+@@ -3380,7 +3380,7 @@ static void sde_cp_notify_hist_event(struct drm_crtc *crtc_drm, void *arg)
+ 	if (!crtc->hist_blob)
+ 		return;
+ 
+-	ret = pm_runtime_get_sync(kms->dev->dev);
++	ret = pm_runtime_resume_and_get(kms->dev->dev);
+ 	if (ret < 0) {
+ 		SDE_ERROR("failed to enable power resource %d\n", ret);
+ 		SDE_EVT32(ret, SDE_EVTLOG_ERROR);
+diff --git a/techpack/display/msm/sde/sde_core_irq.c b/techpack/display/msm/sde/sde_core_irq.c
+index ecb9d5db2..c789ebb6b 100644
+--- a/techpack/display/msm/sde/sde_core_irq.c
++++ b/techpack/display/msm/sde/sde_core_irq.c
+@@ -452,7 +452,7 @@ void sde_core_irq_preinstall(struct sde_kms *sde_kms)
+ 	}
+ 
+ 	if (!sde_in_trusted_vm(sde_kms)) {
+-		rc = pm_runtime_get_sync(sde_kms->dev->dev);
++		rc = pm_runtime_resume_and_get(sde_kms->dev->dev);
+ 		if (rc < 0) {
+ 			SDE_ERROR("failed to enable power resource %d\n", rc);
+ 			SDE_EVT32(rc, SDE_EVTLOG_ERROR);
+@@ -505,7 +505,7 @@ void sde_core_irq_uninstall(struct sde_kms *sde_kms)
+ 		return;
+ 	}
+ 
+-	rc = pm_runtime_get_sync(sde_kms->dev->dev);
++	rc = pm_runtime_resume_and_get(sde_kms->dev->dev);
+ 	if (rc < 0) {
+ 		SDE_ERROR("failed to enable power resource %d\n", rc);
+ 		SDE_EVT32(rc, SDE_EVTLOG_ERROR);
+diff --git a/techpack/display/msm/sde/sde_crtc.c b/techpack/display/msm/sde/sde_crtc.c
+index 472b623a3..bb080cde9 100644
+--- a/techpack/display/msm/sde/sde_crtc.c
++++ b/techpack/display/msm/sde/sde_crtc.c
+@@ -3864,7 +3864,7 @@ static int _sde_crtc_vblank_enable(
+ 	if (enable) {
+ 		int ret;
+ 
+-		ret = pm_runtime_get_sync(crtc->dev->dev);
++		ret = pm_runtime_resume_and_get(crtc->dev->dev);
+ 		if (ret < 0)
+ 			return ret;
+ 
+@@ -6067,7 +6067,7 @@ static ssize_t _sde_crtc_misr_read(struct file *file,
+ 	if (!sde_kms)
+ 		return -EINVAL;
+ 
+-	rc = pm_runtime_get_sync(crtc->dev->dev);
++	rc = pm_runtime_resume_and_get(crtc->dev->dev);
+ 	if (rc < 0)
+ 		return rc;
+ 
+@@ -6839,7 +6839,7 @@ static int _sde_crtc_event_enable(struct sde_kms *kms,
+ 
+ 	ret = 0;
+ 	if (crtc_drm->enabled) {
+-		ret = pm_runtime_get_sync(crtc_drm->dev->dev);
++		ret = pm_runtime_resume_and_get(crtc_drm->dev->dev);
+ 		if (ret < 0) {
+ 			SDE_EVT32(ret, SDE_EVTLOG_ERROR);
+ 			kfree(node);
+@@ -6907,7 +6907,7 @@ static int _sde_crtc_event_disable(struct sde_kms *kms,
+ 		kfree(node);
+ 		return 0;
+ 	}
+-	ret = pm_runtime_get_sync(crtc_drm->dev->dev);
++	ret = pm_runtime_resume_and_get(crtc_drm->dev->dev);
+ 	if (ret < 0) {
+ 		SDE_ERROR("failed to enable power resource %d\n", ret);
+ 		SDE_EVT32(ret, SDE_EVTLOG_ERROR);
+diff --git a/techpack/display/msm/sde/sde_encoder.c b/techpack/display/msm/sde/sde_encoder.c
+index dda28714e..2075964e5 100644
+--- a/techpack/display/msm/sde/sde_encoder.c
++++ b/techpack/display/msm/sde/sde_encoder.c
+@@ -1531,7 +1531,7 @@ static int _sde_encoder_resource_control_helper(struct drm_encoder *drm_enc,
+ 
+ 	if (enable) {
+ 		/* enable SDE core clks */
+-		rc = pm_runtime_get_sync(drm_enc->dev->dev);
++		rc = pm_runtime_resume_and_get(drm_enc->dev->dev);
+ 		if (rc < 0) {
+ 			SDE_ERROR("failed to enable power resource %d\n", rc);
+ 			SDE_EVT32(rc, SDE_EVTLOG_ERROR);
+@@ -4595,7 +4595,7 @@ static ssize_t _sde_encoder_misr_read(struct file *file,
+ 	}
+ 	drm_enc = &sde_enc->base;
+ 
+-	rc = pm_runtime_get_sync(drm_enc->dev->dev);
++	rc = pm_runtime_resume_and_get(drm_enc->dev->dev);
+ 	if (rc < 0)
+ 		return rc;
+ 
+diff --git a/techpack/display/msm/sde/sde_kms.c b/techpack/display/msm/sde/sde_kms.c
+index bc344a527..dd9655775 100644
+--- a/techpack/display/msm/sde/sde_kms.c
++++ b/techpack/display/msm/sde/sde_kms.c
+@@ -524,7 +524,7 @@ static int _sde_kms_sui_misr_ctrl(struct sde_kms *sde_kms,
+ 	int ret;
+ 
+ 	if (enable) {
+-		ret = pm_runtime_get_sync(sde_kms->dev->dev);
++		ret = pm_runtime_resume_and_get(sde_kms->dev->dev);
+ 		if (ret < 0) {
+ 			SDE_ERROR("failed to enable resource, ret:%d\n", ret);
+ 			return ret;
+diff --git a/techpack/display/msm/sde/sde_plane.c b/techpack/display/msm/sde/sde_plane.c
+index 1aa639aef..e2a0500a1 100644
+--- a/techpack/display/msm/sde/sde_plane.c
++++ b/techpack/display/msm/sde/sde_plane.c
+@@ -422,7 +422,7 @@ int sde_plane_danger_signal_ctrl(struct drm_plane *plane, bool enable)
+ 	if (!psde->is_rt_pipe)
+ 		goto end;
+ 
+-	rc = pm_runtime_get_sync(plane->dev->dev);
++	rc = pm_runtime_resume_and_get(plane->dev->dev);
+ 	if (rc < 0) {
+ 		SDE_ERROR("failed to enable power resource %d\n", rc);
+ 		SDE_EVT32(rc, SDE_EVTLOG_ERROR);
+diff --git a/techpack/display/msm/sde_dbg.c b/techpack/display/msm/sde_dbg.c
+index ffa3ae346..5fb638056 100644
+--- a/techpack/display/msm/sde_dbg.c
++++ b/techpack/display/msm/sde_dbg.c
+@@ -497,7 +497,7 @@ static void _sde_dump_reg(const char *dump_name, u32 reg_dump_flag,
+ 	SDE_DBG_LOG_DUMP_ADDR(dump_name, dump_addr, len_padded, (unsigned long)(addr - base_addr));
+ 
+ 	if (_sde_power_check(sde_dbg_base.dump_mode)) {
+-		rc = pm_runtime_get_sync(sde_dbg_base.dev);
++		rc = pm_runtime_resume_and_get(sde_dbg_base.dev);
+ 		if (rc < 0) {
+ 			pr_err("failed to enable power %d\n", rc);
+ 			return;
+@@ -1124,7 +1124,7 @@ static void _sde_dump_array(struct sde_dbg_reg_base *blk_arr[],
+ 	}
+ 
+ 	if (_sde_power_check(sde_dbg_base.dump_mode)) {
+-		rc = pm_runtime_get_sync(sde_dbg_base.dev);
++		rc = pm_runtime_resume_and_get(sde_dbg_base.dev);
+ 		if (rc < 0) {
+ 			pr_err("failed to enable power %d\n", rc);
+ 			return;
